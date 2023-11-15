@@ -4,8 +4,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const app = express();
+const cors = require('cors');
 const mongoose = require('mongoose');  
 // MongoDB setup
+app.use(cors());
 async function connectDb() {
     try {
       await mongoose.connect('mongodb+srv://mdkaif:xx2B66OqVL4sbSrd@kaif.o7igbqj.mongodb.net/', {
@@ -25,6 +27,9 @@ const farmer = mongoose.model('farmer', new mongoose.Schema({
   username: String,
   password: String,
   name: String,
+  crop: String,
+  landSize: Number,
+  region:String
 }));
 
 
@@ -93,7 +98,123 @@ app.get('/api/user', async (req, res) => {
     }
   });
   
+  app.post('/api/farmer', async (req, res) => {
+    const token = req.headers.authorization;
+  
+    if (token) {
+      jwt.verify(token, jwtSecret, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: 'Invalid token' });
+        } else {
+          try {
+            // Extract information from the request body
+            const { crop, landSize } = req.body;
+  
+            // Validate input (you can add more validation logic as needed)
+            if (!crop || !landSize) {
+              return res.status(400).json({ message: 'Missing required fields' });
+            }
+  
+            // Update the user's document with farmer information
+            const user = await farmer.findOneAndUpdate(
+              {  _id: decoded.userId },
+              { $set: { crop, landSize } },
+              { new: true }
+            );
+  
+            if (user) {
+              res.json({ message: 'Farmer information saved successfully', user });
+            } else {
+              res.status(404).json({ message: 'User not found' });
+            }
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal Server Error' });
+          }
+        }
+      });
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
+  });
 
+  app.put('/api/farmer/update', async (req, res) => {
+    const token = req.headers.authorization;
+  
+    if (token) {
+      jwt.verify(token, jwtSecret, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: 'Invalid token' });
+        } else {
+          try {
+            // Extract information from the request body
+            const { crop, landSize } = req.body;
+  
+            // Validate input (you can add more validation logic as needed)
+            if (!crop && !landSize) {
+              return res.status(400).json({ message: 'No fields to update' });
+            }
+  
+            // Update the user's document with farmer information
+            const updatedUser = await farmer.findOneAndUpdate(
+              { _id: decoded.userId },
+              { $set: { crop, landSize } },
+              { new: true }
+            );
+  
+            if (updatedUser) {
+              res.json({ message: 'Farmer information updated successfully', user: updatedUser });
+            } else {
+              res.status(404).json({ message: 'User not found' });
+            }
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal Server Error' });
+          }
+        }
+      });
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
+  });
+
+
+  app.put('/api/user/location', async (req, res) => {
+    const token = req.headers.authorization;
+  
+    if (token) {
+      jwt.verify(token, jwtSecret, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: 'Invalid token' });
+        } else {
+          try {
+            const {  region} = req.body;
+  
+            // Update the user's location
+            const updatedUser = await farmer.findOneAndUpdate(
+              { _id: decoded.userId },
+              {
+                region
+              },
+              { new: true }
+            );
+  
+            if (updatedUser) {
+              res.json({ message: 'User location updated successfully', user: updatedUser });
+            } else {
+              res.status(404).json({ message: 'User not found' });
+            }
+          } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal Server Error' });
+          }
+        }
+      });
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
+  });
+  
 
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
