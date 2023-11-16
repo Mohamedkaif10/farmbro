@@ -31,7 +31,11 @@ const farmer = mongoose.model('farmer', new mongoose.Schema({
   landSize: Number,
   region:String
 }));
-
+const Scheme = mongoose.model('schemes', new mongoose.Schema({
+    name: String,
+    region: String,
+    // Add other scheme-specific fields here
+  }));
 
 app.use(bodyParser.json());
 
@@ -214,7 +218,84 @@ app.get('/api/user', async (req, res) => {
       res.status(401).json({ message: 'Unauthorized' });
     }
   });
-  
 
+
+  app.get('/api/schemes', async (req, res) => {
+    try {
+      const token = req.headers.authorization;
+  
+      if (!token) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+  
+      jwt.verify(token, jwtSecret, async (err, decoded) => {
+        if (err) {
+          return res.status(401).json({ message: 'Invalid token' });
+        }
+  
+        try {
+          const user = await farmer.findById(decoded.userId);
+  
+          if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+          }
+  
+          const schemeses = await Scheme.find({ region: user.region });
+  
+          res.json({ schemeses });
+        } catch (error) {
+          console.error('Error fetching schemes:', error);
+          res.status(500).json({ message: 'Internal Server Error' });
+        }
+      });
+    } catch (error) {
+      console.error('Error fetching schemes:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+
+
+  // server.js
+
+// ... (your existing code)
+
+app.get('/api/schemes/:schemeId', async (req, res) => {
+    const token = req.headers.authorization;
+  
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  
+    jwt.verify(token, jwtSecret, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+      } else {
+        try {
+          // Fetch user data based on decoded userId
+          const user = await farmer.findOne({ _id: decoded.userId });
+  
+          if (user) {
+            // Fetch the specific scheme based on schemeId and user's region
+            const scheme = await Scheme.findOne({ _id: req.params.schemeId, region: user.region });
+  
+            if (scheme) {
+              res.json({ scheme });
+            } else {
+              // Scheme not found for the user's region
+              res.status(404).json({ message: 'Scheme not found' });
+            }
+          } else {
+            // User not found (this should not happen if tokens are valid)
+            res.status(404).json({ message: 'User not found' });
+          }
+        } catch (error) {
+          // Handle database query error
+          console.error(error);
+          res.status(500).json({ message: 'Internal Server Error' });
+        }
+      }
+    });
+  });
+  
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

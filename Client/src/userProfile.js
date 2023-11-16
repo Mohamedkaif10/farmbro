@@ -1,77 +1,70 @@
-// src/UserProfile.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
 import { useNavigate } from 'react-router-dom';
-
+import { Link } from 'react-router-dom';
 const UserProfile = () => {
   const [userName, setUserName] = useState('');
   const [currLocation, setCurrLocation] = useState({});
- 
-const navigate=useNavigate()
-useEffect(() => {
-    getLocation();
-   
-  }, []);
+  const [schemes, setSchemes] = useState([]);
+  const navigate = useNavigate();
 
-  const getLocation = async () => {
-    const location = await axios.get("https://ipapi.co/json");
-    setCurrLocation(location.data);
-  };
-
-  
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
-        const response = await axios.get('http://localhost:5001/api/user', {
+        const token = localStorage.getItem('token');
+
+        // Fetch user data
+        const userDataResponse = await axios.get('http://localhost:5001/api/user', {
           headers: { Authorization: token },
         });
-  
-        setUserName(response.data.user.name);
-        
-        const location = await axios.get("https://ipapi.co/json");
+        setUserName(userDataResponse.data.user.name);
+
+        // Fetch location
+        const locationResponse = await axios.get('https://ipapi.co/json');
+        setCurrLocation(locationResponse.data);
+        console.log(locationResponse.data.region)
+
+        // Update user location
         await axios.put(
           'http://localhost:5001/api/user/location',
-          { region: location.data.region },
+          { region: locationResponse.data.region },
+
           { headers: { Authorization: token } }
         );
-  
-        console.log('User location updated successfully');
+
+        // Fetch schemes
+        const schemesResponse = await axios.get('http://localhost:5001/api/schemes', {
+          headers: { Authorization: token },
+        });
+        setSchemes(schemesResponse.data.schemeses);
+console.log(schemesResponse.data.schemeses)
+        console.log('Data fetched successfully');
       } catch (error) {
-        console.error('Error fetching user data:', error.response.data.message);
+        console.error('Error fetching data:', error.response?.data?.message || error.message);
         // Handle error, e.g., redirect to login page
       }
     };
-  
-    fetchUserData();
-  }, []);
-  
-//   const handleUpdateLocation = async () => {
-//     try {
-//       const token = localStorage.getItem('token');
-//       await axios.put(
-//         'http://localhost:5001/api/user/location',
-//         {  region: currLocation.region },
-//         { headers: { Authorization: token } }
-//       );
 
-//       console.log('User location updated successfully');
-      
-//     } catch (error) {
-//       console.error('Error updating user location:', error.response.data.message);
-//     }
-//   };
-const handleupdateProfile=()=>{
-          navigate("/profile")
-}
-console.log(currLocation.region)
+    fetchData();
+  }, []);
+
+  const handleUpdateProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <>
-    <div>
-      <h2>Welcome, {userName}!</h2>
-    </div>
-    <button onClick={handleupdateProfile}>profile</button>
+      <div>
+        <h2>Welcome, {userName}!</h2>
+      </div>
+      <ul>
+        {schemes && schemes.map((scheme) => (
+             <li key={scheme._id}>
+           <Link to={`/${scheme._id}`}>{scheme.name}</Link>
+           </li>
+        ))}
+      </ul>
+      <button onClick={handleUpdateProfile}>Profile</button>
     </>
   );
 };
