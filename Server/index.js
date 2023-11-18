@@ -34,6 +34,8 @@ const farmer = mongoose.model('farmer', new mongoose.Schema({
 const Scheme = mongoose.model('schemes', new mongoose.Schema({
     name: String,
     region: String,
+    audio: String,
+    desc:String
     // Add other scheme-specific fields here
   }));
 
@@ -259,7 +261,7 @@ app.get('/api/user', async (req, res) => {
 
 // ... (your existing code)
 
-app.get('/api/schemes/:schemeId', async (req, res) => {
+app.get('/api/schemes/:schemeId/details', async (req, res) => {
     const token = req.headers.authorization;
   
     if (!token) {
@@ -279,7 +281,60 @@ app.get('/api/schemes/:schemeId', async (req, res) => {
             const scheme = await Scheme.findOne({ _id: req.params.schemeId, region: user.region });
   
             if (scheme) {
-              res.json({ scheme });
+              // Send scheme details in the JSON response
+              const schemeDetails = {
+                name: scheme.name,
+                region: scheme.region,
+                desc: scheme.desc,
+              };
+              res.json({ schemeDetails });
+            } else {
+              // Scheme not found for the user's region
+              res.status(404).json({ message: 'Scheme not found' });
+              console.log(err)
+            }
+          } else {
+            // User not found (this should not happen if tokens are valid)
+            res.status(404).json({ message: 'User not found' });
+          }
+        } catch (error) {
+          // Handle database query error
+          console.error(error);
+          res.status(500).json({ message: 'Internal Server Error' });
+        }
+      }
+    });
+  });
+  
+  app.get('/api/schemes/:schemeId/audio', async (req, res) => {
+    const token = req.headers.authorization;
+  
+    if (!token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  
+    jwt.verify(token, jwtSecret, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: 'Invalid token' });
+      } else {
+        try {
+          // Fetch user data based on decoded userId
+          const user = await farmer.findOne({ _id: decoded.userId });
+  
+          if (user) {
+            // Fetch the specific scheme based on schemeId and user's region
+            const scheme = await Scheme.findOne({ _id: req.params.schemeId, region: user.region });
+  
+            if (scheme) {
+              // Set the appropriate content type for audio
+              res.setHeader('Content-Type', 'audio/mpeg'); // Update based on your audio format
+  
+              // Send the base64 encoded audio data in the response
+              const audioBuffer = Buffer.from(scheme.audio, 'base64');
+              res.write(audioBuffer);
+  
+              // End the audio response
+              res.end();
             } else {
               // Scheme not found for the user's region
               res.status(404).json({ message: 'Scheme not found' });
@@ -296,6 +351,9 @@ app.get('/api/schemes/:schemeId', async (req, res) => {
       }
     });
   });
+  
+  
+  
   
 const PORT = 5001;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

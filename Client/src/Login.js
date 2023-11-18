@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import "./Login.css"
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -25,21 +26,23 @@ const Login = () => {
   };
 
   return (
-    <div>
+    <div className='above'>
+    <div className='boddy'>
       <h2>Login</h2>
       <form>
-        <div>
+        <div className='user'>
           <label>Username:</label>
           <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
         </div>
-        <div>
+        <div className='pass'>
           <label>Password:</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         </div>
-        <button type="button" onClick={handleLogin}>
+        <button className='login' type="button" onClick={handleLogin}>
           Login
         </button>
       </form>
+    </div>
     </div>
   );
 };
