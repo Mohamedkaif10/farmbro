@@ -22,12 +22,27 @@ const WeatherModal = ({ onClose, latitude, longitude }) => {
   }, [latitude, longitude]);
 
   const modalRoot = document.getElementById('modal-root');
-
+  
   useEffect(() => {
     if (!modalRoot) {
       throw new Error("Target container 'modal-root' is not found in the DOM.");
     }
   }, [modalRoot]);
+  const renderWeatherText = (weatherMain) => {
+    switch (weatherMain) {
+      case 'Haze':
+         return 'పొగమంచు';
+      case 'rainy':
+        return 'వర్షపు'
+      default:
+        return weatherMain;
+    }
+   
+  };
+  const convertKelvinToCelsius = (kelvin) => {
+    return (kelvin - 273.15).toFixed(2); // Keep two decimal places
+  };
+  
 
   return createPortal(
     <div className="modal">
@@ -35,13 +50,12 @@ const WeatherModal = ({ onClose, latitude, longitude }) => {
         <button  onClick={onClose} className="close-button">
           Close
         </button>
-        <div>
-          <h3>Weather Information</h3>
-          <p>Latitude: {latitude}</p>
-          <p>Longitude: {longitude}</p>
-          {/* Display other weather information as needed */}
-          <p>Temperature: {weather.main?.temp}</p>
-          <p>Humidity: {weather.main?.humidity}</p>
+        <div className='content_of_'>
+          <h3>వాతావరణ సమాచారం</h3>
+          <p>ఉష్ణోగ్రత: {weather.main?.temp && convertKelvinToCelsius(weather.main.temp)}°C</p>
+         <p>తేమ: {weather.main?.humidity}%</p>
+         <p>వాతావరణం: {weather.weather && weather.weather.length > 0 ? renderWeatherText(weather.weather[0].main) : 'N/A'}</p>
+
           {/* Add more weather information as needed */}
         </div>
       </div>

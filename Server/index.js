@@ -194,7 +194,7 @@ app.get('/api/user', async (req, res) => {
           return res.status(401).json({ message: 'Invalid token' });
         } else {
           try {
-            const {  region} = req.body;
+            const { region } = req.body;
   
             // Update the user's location
             const updatedUser = await farmer.findOneAndUpdate(
@@ -206,7 +206,22 @@ app.get('/api/user', async (req, res) => {
             );
   
             if (updatedUser) {
-              res.json({ message: 'User location updated successfully', user: updatedUser });
+              // Determine the new name based on the region (modify this logic accordingly)
+              let updatedName = updatedUser.name;
+  
+              if (region === 'Telangana') {
+                updatedName = 'స్వాగతం రైతు';
+              } else if (region === 'Kerala') {
+                updatedName = 'സ്വാഗതം കർഷകൻ';
+              }
+              else if(region === 'Uttar Pradesh'){
+                updatedName = 'स्वागत है किसान';
+              }
+  
+              // Update the user's name
+              await farmer.updateOne({ _id: decoded.userId }, { name: updatedName });
+  
+              res.json({ message: 'User location and name updated successfully', user: updatedUser });
             } else {
               res.status(404).json({ message: 'User not found' });
             }
@@ -220,6 +235,7 @@ app.get('/api/user', async (req, res) => {
       res.status(401).json({ message: 'Unauthorized' });
     }
   });
+  
 
 
   app.get('/api/schemes', async (req, res) => {

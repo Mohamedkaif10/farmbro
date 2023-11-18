@@ -27,14 +27,14 @@ const UserProfile = () => {
         // Fetch location
         const locationResponse = await axios.get('https://ipapi.co/json');
         setCurrLocation(locationResponse.data);
-        console.log(locationResponse.data.region)
-        console.log(locationResponse.data.latitude)
-        console.log(locationResponse.data.longitude)
+        console.log("My region",locationResponse.data.region)
+        console.log("My latitue",locationResponse.data.latitude)
+        console.log("My longitute",locationResponse.data.longitude)
 
         // Update user location
         await axios.put(
           'http://localhost:5001/api/user/location',
-          { region: locationResponse.data.region },
+          { region: locationResponse.data.region},
 
           { headers: { Authorization: token } }
         );
@@ -56,10 +56,6 @@ console.log(schemesResponse.data.schemeses)
 
     fetchData();
   }, []);
-
-  const handleUpdateProfile = () => {
-    navigate('/profile');
-  };
   const handleOpenWeatherModal = async () => {
     try {
       const weatherResponse = await axios.get('https://ipapi.co/json');
@@ -80,7 +76,7 @@ console.log(schemesResponse.data.schemeses)
   };
 
   return (
-    <>
+    <div className='whole_container'>
       {loading ? (
         <div className="loader-container">
           <div className="loader"></div>
@@ -88,7 +84,7 @@ console.log(schemesResponse.data.schemeses)
       ) : (
         <>
           <div className="welcome-container">
-            <h2>Welcome, {userName}!</h2>
+          <h2> {userName}!</h2>
           </div>
           <div className="schemes-container">
             {schemes &&
@@ -101,11 +97,11 @@ console.log(schemesResponse.data.schemeses)
               ))}
           </div>
           <button className="weather_button" onClick={handleOpenWeatherModal}>
-            Show Weather
+            
           </button>
-          <button className="profile_button" onClick={handleUpdateProfile}>
+          {/* <button className="profile_button" onClick={handleUpdateProfile}>
             Profile
-          </button>
+          </button> */}
           {showWeatherModal && (
             <WeatherModal
               onClose={handleCloseWeatherModal}
@@ -115,7 +111,7 @@ console.log(schemesResponse.data.schemeses)
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

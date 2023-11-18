@@ -1,6 +1,9 @@
 /* Your component CSS */
 
 /* Container styles */
+body{
+    background-color: #57cc99;
+}
 .container {
     background-color: #fff;
     padding: 20px;
@@ -10,6 +13,7 @@
     max-width: 600px;
     margin: auto;
     margin-top: 20px;
+   background-color: #c7f9cc;
   }
   
   .h222 {
@@ -18,6 +22,7 @@
   
   p {
     margin: 10px 0;
+    font-weight: 700;
   }
   
   /* Audio player styles */
