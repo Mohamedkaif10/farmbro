@@ -18,20 +18,20 @@ const UserProfile = () => {
       try {
         const token = localStorage.getItem('token');
 
-        // Fetch user data
+        
         const userDataResponse = await axios.get('http://localhost:5001/api/user', {
           headers: { Authorization: token },
         });
         setUserName(userDataResponse.data.user.name);
 
-        // Fetch location
+       
         const locationResponse = await axios.get('https://ipapi.co/json');
         setCurrLocation(locationResponse.data);
         console.log("My region",locationResponse.data.region)
         console.log("My latitue",locationResponse.data.latitude)
         console.log("My longitute",locationResponse.data.longitude)
 
-        // Update user location
+      
         await axios.put(
           'http://localhost:5001/api/user/location',
           { region: locationResponse.data.region},
@@ -39,7 +39,7 @@ const UserProfile = () => {
           { headers: { Authorization: token } }
         );
 
-        // Fetch schemes
+        
         const schemesResponse = await axios.get('http://localhost:5001/api/schemes', {
           headers: { Authorization: token },
         });
@@ -50,7 +50,7 @@ console.log(schemesResponse.data.schemeses)
       } catch (error) {
         console.error('Error fetching data:', error.response?.data?.message || error.message);
         setLoading(false);
-        // Handle error, e.g., redirect to login page
+       
       }
     };
 
@@ -99,9 +99,6 @@ console.log(schemesResponse.data.schemeses)
           <button className="weather_button" onClick={handleOpenWeatherModal}>
             
           </button>
-          {/* <button className="profile_button" onClick={handleUpdateProfile}>
-            Profile
-          </button> */}
           {showWeatherModal && (
             <WeatherModal
               onClose={handleCloseWeatherModal}

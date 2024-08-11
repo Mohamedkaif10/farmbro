@@ -8,7 +8,7 @@ const UpdateProfile = () => {
 const navigate = useNavigate()
   const handleUpdate = async () => {
     try {
-      const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
+      const token = localStorage.getItem('token'); 
 
       const response = await axios.post(
         'http://localhost:5001/api/farmer',
@@ -20,10 +20,10 @@ const navigate = useNavigate()
 
       console.log('Update Response:', response.data);
       navigate('/page');
-      // Handle success, e.g., show a success message
+    
     } catch (error) {
       console.error('Update failed:', error.response.data.message);
-      // Handle update failure, e.g., show an error message
+    
     }
   };
 

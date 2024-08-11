@@ -17,11 +17,11 @@ const Login = () => {
       const token = response.data.token;
       console.log('Token:', token);
       localStorage.setItem('token', token);
-      // Handle storing the token, e.g., in localStorage or a state management library
+     
       history('/page');
     } catch (error) {
       console.error('Login failed:', error.response.data.message);
-      // Handle login failure, e.g., show an error message
+     
     }
   };
 

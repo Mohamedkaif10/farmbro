@@ -17,7 +17,7 @@ const WeatherModal = ({ onClose, latitude, longitude }) => {
       }
     };
 
-    // Call the searchWeather function when the component mounts
+
     searchWeather();
   }, [latitude, longitude]);
 
@@ -40,7 +40,7 @@ const WeatherModal = ({ onClose, latitude, longitude }) => {
    
   };
   const convertKelvinToCelsius = (kelvin) => {
-    return (kelvin - 273.15).toFixed(2); // Keep two decimal places
+    return (kelvin - 273.15).toFixed(2);
   };
   
 
@@ -56,7 +56,7 @@ const WeatherModal = ({ onClose, latitude, longitude }) => {
          <p>తేమ: {weather.main?.humidity}%</p>
          <p>వాతావరణం: {weather.weather && weather.weather.length > 0 ? renderWeatherText(weather.weather[0].main) : 'N/A'}</p>
 
-          {/* Add more weather information as needed */}
+        
         </div>
       </div>
     </div>,

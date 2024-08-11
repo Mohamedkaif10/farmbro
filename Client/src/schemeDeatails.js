@@ -14,7 +14,7 @@ const SchemeDetails = () => {
       try {
         const token = localStorage.getItem('token');
 
-        // Fetch scheme details
+       
         const detailsResponse = await axios.get(`http://localhost:5001/api/schemes/${schemeId}/details`, {
           headers: { Authorization: token },
         });
@@ -28,19 +28,19 @@ const SchemeDetails = () => {
     fetchSchemeDetails();
   }, [schemeId]);
 
-  // This useEffect fetches audio separately
+
   useEffect(() => {
     const fetchAudio = async () => {
       try {
         const token = localStorage.getItem('token');
   
-        // Fetch audio
+       
         const audioResponse = await axios.get(`http://localhost:5001/api/schemes/${schemeId}/audio`, {
           headers: { Authorization: token },
-          responseType: 'blob', // Specify response type as blob for binary data
+          responseType: 'blob', 
         });
   
-        // Convert audio blob to base64
+       
         const reader = new FileReader();
         reader.onloadend = () => {
           const audioBase64 = reader.result.split(',')[1];
@@ -62,7 +62,7 @@ const SchemeDetails = () => {
       <p>Scheme Name: {schemeDetails.name}</p>
       <p>Region: {schemeDetails.region}</p>
       <p>Description: {schemeDetails.desc}</p>
-      {/* Display other scheme details as needed */}
+     
       {schemeDetails.audio && (
         <audio controls>
           <source src={`data:audio/mpeg;base64,${schemeDetails.audio}`} type="audio/mpeg" />
