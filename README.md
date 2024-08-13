@@ -26,7 +26,7 @@ This project is a Farmer's Portal that provides farmers with essential informati
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-repo/farmers-portal.git
+git clone https://github.com/mohamedkaif10/farmers-portal.git
 cd farmers-portal
 ```
 
